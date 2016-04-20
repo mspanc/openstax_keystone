@@ -41,12 +41,12 @@ defmodule OpenStax.Keystone.AuthWorker do
   end
 
 
-  def disconect(:refresh, %{endpoint_id: endpoint_id} = s) do
+  def disconect(:refresh, s) do
     {:connect, :refresh, s}
   end
 
 
-  def handle_info(:refresh, %{endpoint_id: endpoint_id} = s) do
+  def handle_info(:refresh, s) do
     {:disconnect, :refresh, s}
   end
 
