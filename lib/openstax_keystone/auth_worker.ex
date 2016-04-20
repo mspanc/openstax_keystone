@@ -97,7 +97,7 @@ defmodule OpenStax.Keystone.AuthWorker do
               {:ok, expires_parsed} = Timex.parse(expires, "{ISO:Extended}")
               timeout = (Timex.DateTime.to_secs(expires_parsed) - Timex.DateTime.to_secs(Timex.DateTime.now()))
 
-              Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Scheduling auth token refresh in #{timeout} seconds"
+              Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Retreived auth token expires in #{timeout} seconds"
 
               Process.send_after(self(), :refresh, timeout * 950) # Wait for 95% of expiry time
 
