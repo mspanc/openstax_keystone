@@ -18,7 +18,7 @@ defmodule OpenStax.Keystone.Mixfile do
 
 
   def application do
-    [applications: [:crypto, :httpoison],
+    [applications: [:crypto, :httpoison, :timex],
      mod: {OpenStax.Keystone, []}]
   end
 
