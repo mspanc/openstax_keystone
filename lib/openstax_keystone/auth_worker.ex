@@ -31,7 +31,7 @@ defmodule OpenStax.Keystone.AuthWorker do
 
 
   def connect(_, %{backend_id: backend_id} = s) do
-    case request_token(OpenStax.Keystone.AuthAgent.get_config(backend_id)) do
+    case request_token(OpenStax.Keystone.Endpoint.get_config(backend_id)) do
       :ok ->
         {:ok, s}
 

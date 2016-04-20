@@ -35,9 +35,13 @@ defmodule OpenStax.Keystone.Endpoint do
       })
     end)
 
-    OpenStax.Keystone.AuthSupervisor.start_worker(backend_id)
+    case Supervisor.start_child(OpenStax.Keystone.AuthSupervisor, Supervisor.Spec.worker(OpenStax.Keystone.AuthWorker, [backend_id], [id: "OpenStax.KeyStone.AuthWorker##{backend_id}"])) do
+      {:ok, _child} ->
+        result
 
-    result
+      {:error, _reason} ->
+        raise :unable_to_start_worker
+    end
   end
 
 

@@ -21,20 +21,4 @@ defmodule OpenStax.Keystone.AuthSupervisor do
   def init(:ok) do
     supervise([], strategy: :one_for_one)
   end
-
-
-  @doc """
-  Starts worker for specified backend.
-
-  Backend has to be added first to the AuthAgent.
-  """
-  def start_worker(backend_id) when is_atom(backend_id) do
-    case Supervisor.start_child(OpenStax.Keystone.AuthSupervisor, Supervisor.Spec.worker(OpenStax.Keystone.AuthWorker, [backend_id], [id: "OpenStax.KeyStone.AuthWorker##{backend_id}"])) do
-      {:ok, _child} ->
-        :ok
-
-      {:error, reason} ->
-        {:error, reason}
-    end
-  end
 end
