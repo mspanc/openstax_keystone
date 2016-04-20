@@ -18,20 +18,20 @@ defmodule OpenStax.Keystone.AuthWorker do
   @retry_timeout   10000
 
 
-  def start_link(backend_id) when is_atom(backend_id) do
-    Connection.start_link(__MODULE__, backend_id, [])
+  def start_link(endpoint_id) when is_atom(endpoint_id) do
+    Connection.start_link(__MODULE__, endpoint_id, [])
   end
 
 
   @doc false
-  def init(backend_id) when is_atom(backend_id) do
-    s = %{backend_id: backend_id}
+  def init(endpoint_id) when is_atom(endpoint_id) do
+    s = %{endpoint_id: endpoint_id}
     {:connect, :init, s}
   end
 
 
-  def connect(_, %{backend_id: backend_id} = s) do
-    case request_token(OpenStax.Keystone.Endpoint.get_config(backend_id)) do
+  def connect(_, %{endpoint_id: endpoint_id} = s) do
+    case request_token(endpoint_id) do
       :ok ->
         {:ok, s}
 
@@ -41,9 +41,18 @@ defmodule OpenStax.Keystone.AuthWorker do
   end
 
 
+  def disconect(:refresh, %{endpoint_id: endpoint_id} = s) do
+    {:connect, :refresh, s}
+  end
 
-  defp request_token(config) do
-    payload = case config do
+
+  def handle_info(:refresh, %{endpoint_id: endpoint_id} = s) do
+    {:disconnect, :refresh, s}
+  end
+
+
+  defp request_token(endpoint_id) do
+    payload = case OpenStax.Keystone.Endpoint.get_config(endpoint_id) do
       %{tenant_id: tenant_id, tenant_name: tenant_name, username: username, password: password} ->
         cond do
           !is_nil(tenant_id) and !is_nil(tenant_name) ->
@@ -74,9 +83,17 @@ defmodule OpenStax.Keystone.AuthWorker do
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
         case status_code do
           200 ->
-            %{"access" => %{"token" => %{"id" => id, "expires" => expires}}} = Poison.decode!(body)
+            %{"access" => %{"token" => %{"id" => auth_token, "expires" => expires}}} = Poison.decode!(body)
 
-            IO.puts "GOT TOKEN #{inspect(id)} #{inspect(expires)}"
+            OpenStax.Keystone.Endpoint.set_auth_token(endpoint_id, auth_token)
+
+            if !is_nil(expires) do
+              {:ok, result} = Timex.parse(expires, "{ISO:Extended}")
+
+              Process.send_after(self(), :refresh, timeout)
+
+            end
+
             :ok
 
           _ ->
