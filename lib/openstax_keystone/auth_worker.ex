@@ -87,7 +87,7 @@ defmodule OpenStax.Keystone.AuthWorker do
           200 ->
             %{"access" => %{"token" => %{"id" => auth_token, "expires" => expires}}} = Poison.decode!(body)
 
-            # OpenStax.Keystone.Endpoint.set_auth_token(endpoint_id, auth_token)
+            OpenStax.Keystone.Endpoint.set_auth_token(endpoint_id, auth_token)
 
             if !is_nil(expires) do
               {:ok, result} = Timex.parse(expires, "{ISO:Extended}")

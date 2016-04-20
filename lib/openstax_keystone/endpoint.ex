@@ -105,7 +105,8 @@ defmodule OpenStax.Keystone.Endpoint do
   """
   def set_auth_token(endpoint_id, auth_token) when is_binary(auth_token) do
     Agent.update(OpenStax.Keystone.Endpoint, fn(state) ->
-      %{state | auth_token: auth_token}
+      endpoint_config = Map.get(state, endpoint_id)
+      Map.put(state, endpoint_id, %{endpoint_config | auth_token: auth_token})
     end)
   end
 end
