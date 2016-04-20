@@ -90,10 +90,10 @@ defmodule OpenStax.Keystone.AuthWorker do
             OpenStax.Keystone.Endpoint.set_auth_token(endpoint_id, auth_token)
 
             if !is_nil(expires) do
-              {:ok, result} = Timex.parse(expires, "{ISO:Extended}")
+              {:ok, expires_parsed} = Timex.parse(expires, "{ISO:Extended}")
+              timeout = (Timex.DateTime.to_secs(expires_parsed) - Timex.DateTime.to_secs(Timex.DateTime.now())) * 950 # Wait for 95% of expiry time
 
-              # Process.send_after(self(), :refresh, timeout)
-
+              Process.send_after(self(), :refresh, timeout)
             end
 
             :ok
