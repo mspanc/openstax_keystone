@@ -1,4 +1,4 @@
-defmodule OpenStax.Keystone.AuthAgent do
+defmodule OpenStax.Keystone.Endpoint do
   @moduledoc """
   This module is responsible for storing configuration of Keystone backends.
   """
@@ -24,7 +24,7 @@ defmodule OpenStax.Keystone.AuthAgent do
   so you have to specify only one of them (put nil as second one).
   """
   def register_password(backend_id, version = :"2.0", endpoint_url, tenant_id, tenant_name, username, password) do
-    result = Agent.update(OpenStax.Keystone.AuthAgent, fn(state) ->
+    result = Agent.update(OpenStax.Keystone.Endpoint, fn(state) ->
       Map.put(state, backend_id, %{
         endpoint_url: endpoint_url,
         version: version,
@@ -54,7 +54,7 @@ defmodule OpenStax.Keystone.AuthAgent do
   so you have to specify only one of them (put nil as second one).
   """
   def register_token(backend_id, version = :"2.0", endpoint_url, tenant_id, tenant_name, token) do
-    Agent.update(OpenStax.Keystone.AuthAgent, fn(state) ->
+    Agent.update(OpenStax.Keystone.Endpoint, fn(state) ->
       Map.put(state, backend_id, %{
         endpoint_url: endpoint_url,
         version: version,
@@ -70,7 +70,7 @@ defmodule OpenStax.Keystone.AuthAgent do
   Returns current access token for a backend.
   """
   def get_config(backend_id) do
-    Agent.get(OpenStax.Keystone.AuthAgent, fn(state) ->
+    Agent.get(OpenStax.Keystone.Endpoint, fn(state) ->
       Map.get(state, backend_id)
     end)
   end
