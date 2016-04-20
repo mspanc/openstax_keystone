@@ -6,6 +6,7 @@ defmodule OpenStax.Keystone.AuthWorker do
 
   use Connection
 
+  require Logger
 
   @request_headers [
     {"Connection",    "Close"},
@@ -16,15 +17,16 @@ defmodule OpenStax.Keystone.AuthWorker do
   @request_timeout 30000
   @request_options [timeout: @request_timeout, recv_timeout: @request_timeout, follow_redirect: false]
   @retry_timeout   10000
+  @logger_tag      "OpenStax.Keystone.AuthWorker"
 
 
-  def start_link(endpoint_id) when is_atom(endpoint_id) do
+  def start_link(endpoint_id) do
     Connection.start_link(__MODULE__, endpoint_id, [])
   end
 
 
   @doc false
-  def init(endpoint_id) when is_atom(endpoint_id) do
+  def init(endpoint_id) do
     s = %{endpoint_id: endpoint_id}
     {:connect, :init, s}
   end
@@ -81,28 +83,37 @@ defmodule OpenStax.Keystone.AuthWorker do
     end
 
 
+    Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Retreiving auth token..."
     case HTTPoison.request(:post, config[:endpoint_url] <> "/tokens", Poison.encode!(payload), @request_headers, @request_options) do
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
         case status_code do
           200 ->
             %{"access" => %{"token" => %{"id" => auth_token, "expires" => expires}}} = Poison.decode!(body)
 
+            Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Successfully retreived auth token"
             OpenStax.Keystone.Endpoint.set_auth_token(endpoint_id, auth_token)
 
             if !is_nil(expires) do
               {:ok, expires_parsed} = Timex.parse(expires, "{ISO:Extended}")
-              timeout = (Timex.DateTime.to_secs(expires_parsed) - Timex.DateTime.to_secs(Timex.DateTime.now())) * 950 # Wait for 95% of expiry time
+              timeout = (Timex.DateTime.to_secs(expires_parsed) - Timex.DateTime.to_secs(Timex.DateTime.now()))
 
-              Process.send_after(self(), :refresh, timeout)
+              Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Scheduling auth token refresh in #{timeout} seconds"
+
+              Process.send_after(self(), :refresh, timeout * 950) # Wait for 95% of expiry time
+
+            else
+              Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Retrieved auth token is valid indefinitely"
             end
 
             :ok
 
           _ ->
+            Logger.warn "[#{@logger_tag} #{inspect(endpoint_id)}] Failed to retrieve auth token: got unexpected status code of #{status_code}"
             {:error, {:httpcode, status_code}}
         end
 
       {:error, reason} ->
+        Logger.warn "[#{@logger_tag} #{inspect(endpoint_id)}] Failed to retrieve auth token: got HTTP error #{inspect(reason)}"
         {:error, {:httperror, reason}}
     end
   end
