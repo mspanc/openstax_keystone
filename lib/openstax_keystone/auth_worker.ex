@@ -74,7 +74,7 @@ defmodule OpenStax.Keystone.AuthWorker do
       {:ok, %HTTPoison.Response{status_code: status_code, body: body}} ->
         case status_code do
           200 ->
-            %{"access" => %{ "token" => %{ "id": id, "expires": expires}}} = Poison.decode!(body)
+            %{"access" => %{"token" => %{"id" => id, "expires" => expires}}} = Poison.decode!(body)
 
             IO.puts "GOT TOKEN #{inspect(id)} #{inspect(expires)}"
             :ok
