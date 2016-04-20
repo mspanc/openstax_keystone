@@ -52,7 +52,7 @@ defmodule OpenStax.Keystone do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(OpenStax.Keystone.AuthAgent, [[name: OpenStax.Keystone.AuthAgent]]),
+      worker(OpenStax.Keystone.Endpoint, [[name: OpenStax.Keystone.Endpoint]]),
       supervisor(OpenStax.Keystone.AuthSupervisor, [[name: OpenStax.Keystone.AuthSupervisor]])
     ]
 

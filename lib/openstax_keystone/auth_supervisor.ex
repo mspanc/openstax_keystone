@@ -30,7 +30,7 @@ defmodule OpenStax.Keystone.AuthSupervisor do
   """
   def start_worker(backend_id) when is_atom(backend_id) do
     case Supervisor.start_child(OpenStax.Keystone.AuthSupervisor, Supervisor.Spec.worker(OpenStax.Keystone.AuthWorker, [backend_id], [id: "OpenStax.KeyStone.AuthWorker##{backend_id}"])) do
-      {:ok, child} ->
+      {:ok, _child} ->
         :ok
 
       {:error, reason} ->
