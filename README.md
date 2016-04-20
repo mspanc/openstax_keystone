@@ -4,7 +4,7 @@
 [![Hex.pm](https://img.shields.io/hexpm/dt/openstax_keystone.svg)](https://hex.pm/packages/openstax_keystone)
 
 OpenStax Keystone provides bindings for [OpenStack Identity v2.0 API](http://developer.openstack.org/api-ref-identity-v2.html)
-API for the [Elixir](http://elixir-lang.org) programming language.
+for the [Elixir](http://elixir-lang.org) programming language.
 
 ## Status
 
