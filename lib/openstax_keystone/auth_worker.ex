@@ -52,7 +52,9 @@ defmodule OpenStax.Keystone.AuthWorker do
 
 
   defp request_token(endpoint_id) do
-    payload = case OpenStax.Keystone.Endpoint.get_config(endpoint_id) do
+    config = OpenStax.Keystone.Endpoint.get_config(endpoint_id)
+    
+    payload = case config do
       %{tenant_id: tenant_id, tenant_name: tenant_name, username: username, password: password} ->
         cond do
           !is_nil(tenant_id) and !is_nil(tenant_name) ->
