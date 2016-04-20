@@ -53,7 +53,7 @@ defmodule OpenStax.Keystone.AuthWorker do
 
   defp request_token(endpoint_id) do
     config = OpenStax.Keystone.Endpoint.get_config(endpoint_id)
-    
+
     payload = case config do
       %{tenant_id: tenant_id, tenant_name: tenant_name, username: username, password: password} ->
         cond do
@@ -92,7 +92,7 @@ defmodule OpenStax.Keystone.AuthWorker do
             if !is_nil(expires) do
               {:ok, result} = Timex.parse(expires, "{ISO:Extended}")
 
-              Process.send_after(self(), :refresh, timeout)
+              # Process.send_after(self(), :refresh, timeout)
 
             end
 
