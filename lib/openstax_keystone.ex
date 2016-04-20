@@ -8,6 +8,15 @@ defmodule OpenStax.Keystone do
   It supports adding multiple endpoints in the runtime, but if you want you may
   add only one during startup.
 
+  ## Installation
+
+  Add the following tuple to `deps` in your `mix.exs`:
+
+      {:openstax_keystone, github: "mspanc/openstax_keystone"}
+
+  and `:openstax_keystone` to your `app_list`.
+
+
   ## Examples
 
   If you use username/password authentication, and Tenant ID as your identifier,
