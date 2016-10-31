@@ -44,7 +44,7 @@ defmodule OpenStax.Keystone do
 
 
   def version do
-    "0.1.1"
+    "0.1.2"
   end
 
 
