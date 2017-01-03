@@ -3,8 +3,8 @@ defmodule OpenStax.Keystone.Mixfile do
 
   def project do
     [app: :openstax_keystone,
-     version: "0.1.3",
-     elixir: "~> 1.1",
+     version: "0.1.4",
+     elixir: "~> 1.3",
      elixirc_paths: elixirc_paths(Mix.env),
      description: "OpenStack Keystone client",
      maintainers: ["Marcin Lewandowski"],
@@ -35,9 +35,9 @@ defmodule OpenStax.Keystone.Mixfile do
   defp deps(:test_dev) do
     [
       {:httpoison, "~> 0.10"},
-      {:poison, "~> 1.3" },
-      {:connection, "~> 1.0.4"},
-      {:timex, "~> 2.2"},
+      {:poison, "~> 2.0" },
+      {:connection, "~> 1.0"},
+      {:timex, "~> 3.1"},
       {:espec, "~> 0.8.17", only: :test},
       {:ex_doc, "~> 0.11.4", only: :dev},
       {:earmark, ">= 0.0.0", only: :dev}
