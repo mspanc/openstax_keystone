@@ -94,8 +94,8 @@ defmodule OpenStax.Keystone.AuthWorker do
             OpenStax.Keystone.Endpoint.set_auth_token(endpoint_id, auth_token)
 
             if !is_nil(expires) do
-              {:ok, expires_parsed} = Timex.parse(expires, "{ISO:Extended}")
-              timeout = (Timex.to_secs(expires_parsed) - Timex.to_secs(Timex.now()))
+              {:ok, expires_parsed} = Timex.Duration.parse(expires)
+              timeout = Timex.to_unix(expires_parsed) - Timex.to_unix(Timex.now())
 
               Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Retreived auth token expires in #{timeout} seconds"
 
