@@ -7,7 +7,6 @@ defmodule OpenStax.Keystone.Mixfile do
       version: "1.0.0",
       elixir: "~> 1.6",
       description: "OpenStack Keystone client",
-      maintainers: ["Marcin Lewandowski"],
       licenses: ["MIT"],
       name: "OpenStax.Keystone",
       source_url: "https://github.com/mspanc/openstax_keystone",
