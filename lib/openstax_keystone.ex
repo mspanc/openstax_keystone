@@ -12,48 +12,50 @@ defmodule OpenStax.Keystone do
 
   Add the following tuple to `deps` in your `mix.exs`:
 
-      {:openstax_keystone, github: "mspanc/openstax_keystone"}
-
-  and `:openstax_keystone` to your `app_list`.
-
+      {:openstax_keystone, "~> 1.0"}
 
   ## Examples
 
   If you use username/password authentication, and Tenant ID as your identifier,
   use the following code in order to add the new keystone endpoint:
 
-      OpenStax.Keystone.Endpoint.register_password(:my_storage, :"2.0", "https://auth.example.com/v2.0", "my_tenant_id", nil, "john", "secret")
+      OpenStax.Keystone.Endpoint.Registry.register_password(:myendpoint, "https://auth.example.com/v2.0", "my_tenant_id", nil, "john", "secret")
 
   If you use username/password authentication, and Tenant Name as your identifier,
   use the following code in order to add the new keystone endpoint:
 
-      OpenStax.Keystone.Endpoint.register_password(:my_storage, :"2.0", "https://auth.example.com/v2.0", nil, "my_tenant_name", "john", "secret")
+      OpenStax.Keystone.Endpoint.Registry.register_password(:myendpoint, "https://auth.example.com/v2.0", nil, "my_tenant_name", "john", "secret")
 
   If you use token authentication, and Tenant ID as your identifier,
   use the following code in order to add the new keystone endpoint:
 
-      OpenStax.Keystone.Endpoint.register_token(:my_storage, :"2.0", "https://auth.example.com/v2.0", "my_tenant_id", nil, "secrettoken")
+      OpenStax.Keystone.Endpoint.Registry.register_token(:myendpoint, "https://auth.example.com/v2.0", "my_tenant_id", nil, "secrettoken")
 
   If you use token authentication, and Tenant Name as your identifier,
   use the following code in order to add the new keystone endpoint:
 
-      OpenStax.Keystone.Endpoint.register_token(:my_storage, :"2.0", "https://auth.example.com/v2.0", nil, "my_tenant_name", "secrettoken")
+      OpenStax.Keystone.Endpoint.Registry.register_token(:myendpoint, "https://auth.example.com/v2.0", nil, "my_tenant_name", "secrettoken")
+
+  After the endpoint is registered you can get its current auth token by
+  calling:
+
+      {:ok, {auth_token, expires}} = OpenStax.Keystone.Endpoint.Registry.get_auth_token(:myendpoint)
   """
 
   use Application
 
-
   def version do
-    "0.1.2"
+    "1.0.0"
   end
-
 
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(OpenStax.Keystone.Endpoint, [[name: OpenStax.Keystone.Endpoint]]),
-      supervisor(OpenStax.Keystone.AuthSupervisor, [[name: OpenStax.Keystone.AuthSupervisor]])
+      worker(OpenStax.Keystone.Endpoint.Registry, [
+        [name: OpenStax.Keystone.Endpoint.Registry]]),
+      supervisor(OpenStax.Keystone.Auth.Supervisor, [
+        [name: OpenStax.Keystone.Auth.Supervisor]])
     ]
 
     opts = [strategy: :one_for_one, name: OpenStax.Keystone]

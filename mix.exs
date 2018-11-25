@@ -2,45 +2,33 @@ defmodule OpenStax.Keystone.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :openstax_keystone,
-     version: "0.1.7",
-     elixir: "~> 1.3",
-     elixirc_paths: elixirc_paths(Mix.env),
-     description: "OpenStack Keystone client",
-     maintainers: ["Marcin Lewandowski"],
-     licenses: ["MIT"],
-     name: "OpenStax.Keystone",
-     source_url: "https://github.com/mspanc/openstax_keystone",
-     package: package,
-     preferred_cli_env: [espec: :test],
-     deps: deps]
+    [
+      app: :openstax_keystone,
+      version: "1.0.0",
+      elixir: "~> 1.6",
+      description: "OpenStack Keystone client",
+      maintainers: ["Marcin Lewandowski"],
+      licenses: ["MIT"],
+      name: "OpenStax.Keystone",
+      source_url: "https://github.com/mspanc/openstax_keystone",
+      package: package(),
+      deps: deps(),
+    ]
   end
-
 
   def application do
-    [applications: [:crypto, :httpoison, :timex],
-     mod: {OpenStax.Keystone, []}]
+    [
+      mod: {OpenStax.Keystone, []},
+      extra_applications: [:logger],
+    ]
   end
-
-
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
-  defp elixirc_paths(_),     do: ["lib",]
-
 
   defp deps do
-    deps(:test_dev)
-  end
-
-
-  defp deps(:test_dev) do
     [
-      {:httpoison, "~> 0.10"},
-      {:poison, "~> 2.0" },
+      {:httpoison, "~> 1.4"},
+      {:jason, "~> 1.1"},
       {:connection, "~> 1.0"},
-      {:timex, "~> 3.1"},
-      {:espec, "~> 0.8.17", only: :test},
-      {:ex_doc, "~> 0.11.4", only: :dev},
-      {:earmark, ">= 0.0.0", only: :dev}
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
     ]
   end
 
