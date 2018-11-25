@@ -34,22 +34,15 @@ defmodule OpenStax.Keystone.AuthWorker do
 
   def connect(_, %{endpoint_id: endpoint_id} = s) do
     case request_token(endpoint_id) do
-      :ok ->
-        {:ok, s}
+      {:ok, nil} ->
+        {:ok, s, :hibernate}
+
+      {:ok, timeout} ->
+        {:backoff, timeout, s}
 
       {:error, reason} ->
-        {:backoff, reason, @retry_timeout}
+        {:backoff, @retry_timeout, s}
     end
-  end
-
-
-  def disconect(:refresh, s) do
-    {:connect, :refresh, s}
-  end
-
-
-  def handle_info(:refresh, s) do
-    {:disconnect, :refresh, s}
   end
 
 
@@ -98,14 +91,12 @@ defmodule OpenStax.Keystone.AuthWorker do
               timeout = Timex.to_unix(expires_parsed) - Timex.to_unix(Timex.now())
 
               Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Retreived auth token expires in #{timeout} seconds"
-
-              Process.send_after(self(), :refresh, timeout * 950) # Wait for 95% of expiry time
+              {:ok, timeout * 950}
 
             else
               Logger.info "[#{@logger_tag} #{inspect(endpoint_id)}] Retrieved auth token is valid indefinitely"
+              {:ok, nil}
             end
-
-            :ok
 
           _ ->
             Logger.warn "[#{@logger_tag} #{inspect(endpoint_id)}] Failed to retrieve auth token: got unexpected status code of #{status_code}"

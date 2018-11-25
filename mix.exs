@@ -3,7 +3,7 @@ defmodule OpenStax.Keystone.Mixfile do
 
   def project do
     [app: :openstax_keystone,
-     version: "0.1.7",
+     version: "0.1.8",
      elixir: "~> 1.3",
      elixirc_paths: elixirc_paths(Mix.env),
      description: "OpenStack Keystone client",

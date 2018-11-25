@@ -12,7 +12,7 @@ defmodule OpenStax.Keystone do
 
   Add the following tuple to `deps` in your `mix.exs`:
 
-      {:openstax_keystone, github: "mspanc/openstax_keystone"}
+      {:openstax_keystone, "~> 0.1"}
 
   and `:openstax_keystone` to your `app_list`.
 
@@ -44,7 +44,7 @@ defmodule OpenStax.Keystone do
 
 
   def version do
-    "0.1.2"
+    "0.1.8"
   end
 
 
