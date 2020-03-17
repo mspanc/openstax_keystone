@@ -15,13 +15,14 @@ defmodule OpenStax.Keystone.Endpoint do
   Registers new endpoint that uses username/password for authentication.
 
   Endpoint URL is a URL to the authentication service, along with /v2.0
-  suffix.
+  or /v3 suffix.
 
-  Version has to be :"2.0" at the moment as this is the only supported
-  version by this library.
+  Version has to be one of :"2.0" or :"3.0".
 
-  According to the specification Tenant's ID and Name are mutually exclusive
-  so you have to specify only one of them (put nil as second one).
+  According to the specification Tenant's ID and Name (while using v2 of
+  the API) or Project's ID and Name respectively (while using v3 of
+  the API ) are mutually exclusive so you have to specify only one of them 
+  (put nil as second one).
   """
   def register_password(endpoint_id, version = :"2.0", endpoint_url, tenant_id, tenant_name, username, password) do
     result = Agent.update(OpenStax.Keystone.Endpoint, fn(state) ->
@@ -45,6 +46,28 @@ defmodule OpenStax.Keystone.Endpoint do
     end
   end
 
+  def register_password(endpoint_id, version = :"3.0", endpoint_url, project_id, project_name, username, password, domain \\ "default") do
+    result = Agent.update(OpenStax.Keystone.Endpoint, fn(state) ->
+      Map.put(state, endpoint_id, %{
+        endpoint_url: endpoint_url,
+        version: version,
+        project_id: project_id,
+        project_name: project_name,
+        username: username,
+        password: password,
+        domain: domain,
+        auth_token: nil
+      })
+    end)
+
+    case Supervisor.start_child(OpenStax.Keystone.AuthSupervisor, Supervisor.Spec.worker(OpenStax.Keystone.AuthWorker, [endpoint_id], [id: "OpenStax.KeyStone.AuthWorker##{endpoint_id}"])) do
+      {:ok, _child} ->
+        result
+
+      {:error, _reason} ->
+        raise :unable_to_start_worker
+    end
+  end
 
   @doc """
   Registers new endpoint that uses token for authentication.
@@ -52,11 +75,15 @@ defmodule OpenStax.Keystone.Endpoint do
   Endpoint URL is a URL to the authentication service, along with /v2.0
   suffix.
 
-  Version has to be :"2.0" at the moment as this is the only supported
-  version by this library.
+  Endpoint URL is a URL to the authentication service, along with /v2.0
+  or /v3 suffix.
 
-  According to the specification Tenant's ID and Name are mutually exclusive
-  so you have to specify only one of them (put nil as second one).
+  Version has to be one of :"2.0" or :"3.0".
+
+  According to the specification Tenant's ID and Name (while using v2 of
+  the API) or Project's ID and Name respectively (while using v3 of
+  the API ) are mutually exclusive so you have to specify only one of them 
+  (put nil as second one).
   """
   def register_token(endpoint_id, version = :"2.0", endpoint_url, tenant_id, tenant_name, token) do
     result = Agent.update(OpenStax.Keystone.Endpoint, fn(state) ->
@@ -67,6 +94,28 @@ defmodule OpenStax.Keystone.Endpoint do
         tenant_name: tenant_name,
         token: token,
         auth_token: nil
+      })
+    end)
+
+    case Supervisor.start_child(OpenStax.Keystone.AuthSupervisor, Supervisor.Spec.worker(OpenStax.Keystone.AuthWorker, [endpoint_id], [id: "OpenStax.KeyStone.AuthWorker##{endpoint_id}"])) do
+      {:ok, _child} ->
+        result
+
+      {:error, _reason} ->
+        raise :unable_to_start_worker
+    end
+  end
+
+  def register_token(endpoint_id, version = :"3.0", endpoint_url, project_id, project_name, token, domain \\ "default") do
+    result = Agent.update(OpenStax.Keystone.Endpoint, fn(state) ->
+      Map.put(state, endpoint_id, %{
+        endpoint_url: endpoint_url,
+        version: version,
+        project_id: project_id,
+        project_name: project_name,
+        token: token,
+        auth_token: nil,
+        domain: domain
       })
     end)
 

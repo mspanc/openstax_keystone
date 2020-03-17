@@ -3,7 +3,7 @@ defmodule OpenStax.Keystone.Mixfile do
 
   def project do
     [app: :openstax_keystone,
-     version: "0.1.8",
+     version: "0.1.9",
      elixir: "~> 1.3",
      elixirc_paths: elixirc_paths(Mix.env),
      description: "OpenStack Keystone client",
@@ -11,9 +11,9 @@ defmodule OpenStax.Keystone.Mixfile do
      licenses: ["MIT"],
      name: "OpenStax.Keystone",
      source_url: "https://github.com/mspanc/openstax_keystone",
-     package: package,
+     package: package(),
      preferred_cli_env: [espec: :test],
-     deps: deps]
+     deps: deps()]
   end
 
 
@@ -39,7 +39,7 @@ defmodule OpenStax.Keystone.Mixfile do
       {:connection, "~> 1.0"},
       {:timex, "~> 3.1"},
       {:espec, "~> 0.8.17", only: :test},
-      {:ex_doc, "~> 0.19", only: :dev},
+      {:ex_doc, "~> 0.14.0", only: :dev},
       {:earmark, ">= 0.0.0", only: :dev}
     ]
   end
