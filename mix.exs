@@ -39,7 +39,7 @@ defmodule OpenStax.Keystone.Mixfile do
       {:connection, "~> 1.0"},
       {:timex, "~> 3.1"},
       {:espec, "~> 0.8.17", only: :test},
-      {:ex_doc, "~> 0.14.0", only: :dev},
+      {:ex_doc, "~> 0.16.1", only: :dev},
       {:earmark, ">= 0.0.0", only: :dev}
     ]
   end
